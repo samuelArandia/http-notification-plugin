@@ -1,0 +1,4 @@
+name: HttpNotificationPlugin
+service: Notification
+plugin-type: java
+provider: org.example.rundeck.HttpNotificationPlugin
