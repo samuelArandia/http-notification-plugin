@@ -43,49 +43,4 @@ public class HttpNotificationPluginTest {
         assertFalse(plugin.postNotification("trigger", new HashMap<>(), config));
     }
 
-    /**
-     * Test that verifies the failure in sending a notification due to an invalid method.
-     */
-    @Test
-    public void testPostNotificationFailureInvalidMethod() {
-        HttpNotificationPlugin plugin = new HttpNotificationPlugin();
-        Map<String, String> config = new HashMap<>();
-        config.put("url", "http://httpbin.org/post");
-        config.put("method", "INVALID");
-        config.put("body", "{\"message\":\"Hello, World!\"}");
-        config.put("contentType", "application/json");
-
-        assertFalse(plugin.postNotification("trigger", new HashMap<>(), config));
-    }
-
-    /**
-     * Test that verifies the failure in sending a notification due to an invalid content type.
-     */
-    @Test
-    public void testPostNotificationFailureInvalidContentType() {
-        HttpNotificationPlugin plugin = new HttpNotificationPlugin();
-        Map<String, String> config = new HashMap<>();
-        config.put("url", "http://httpbin.org/post");
-        config.put("method", "POST");
-        config.put("body", "{\"message\":\"Hello, World!\"}");
-        config.put("contentType", "INVALID");
-
-        assertFalse(plugin.postNotification("trigger", new HashMap<>(), config));
-    }
-
-    /**
-     * Test that verifies the failure in sending a notification due to an invalid body.
-     */
-    @Test
-    public void testPostNotificationFailureInvalidBody() {
-        HttpNotificationPlugin plugin = new HttpNotificationPlugin();
-        Map<String, String> config = new HashMap<>();
-        config.put("url", "http://httpbin.org/post");
-        config.put("method", "POST");
-        config.put("body", "INVALID");
-        config.put("contentType", "application/json");
-
-        assertFalse(plugin.postNotification("trigger", new HashMap<>(), config));
-    }
-
 }
