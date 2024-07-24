@@ -8,7 +8,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /**
  * Plugin of Notification HTTP for Rundeck.
@@ -17,6 +20,9 @@ import java.util.Map;
 @Plugin(service = "Notification", name = "HttpNotificationPlugin")
 @PluginDescription(title = "HTTP Notification Plugin", description = "A plugin that sends notifications via HTTP")
 public class HttpNotificationPlugin implements NotificationPlugin {
+
+    private static final Logger LOGGER = Logger.getLogger(HttpNotificationPlugin.class.getName());
+    private static final ResourceBundle messages = ResourceBundle.getBundle("messages", Locale.getDefault());
 
     /**
      * Send a notification based on the provided parameters.
@@ -28,6 +34,7 @@ public class HttpNotificationPlugin implements NotificationPlugin {
      */
     @Override
     public boolean postNotification(String trigger, Map executionData, Map config) {
+        LOGGER.info("Sending notification with trigger: " + trigger);
         String url = (String) config.get("url");
         String method = (String) config.get("method");
         String body = (String) config.get("body");
@@ -35,16 +42,16 @@ public class HttpNotificationPlugin implements NotificationPlugin {
 
         // create the client http
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            // Create the HTTP request based on the parameters
             HttpUriRequest request = createRequest(method, url, body, contentType);
-            // Execute the request
             client.execute(request);
+            LOGGER.info(messages.getString("notification.success"));
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.severe(String.format(messages.getString("notification.error"), e.getMessage()));
             return false;
         }
     }
+
 
     /**
      * Create an HTTP request based on the method, URL, body, and content type.
@@ -58,30 +65,42 @@ public class HttpNotificationPlugin implements NotificationPlugin {
      */
     private HttpUriRequest createRequest(String method, String url, String body, String contentType) throws Exception {
         HttpUriRequest request;
-
+        LOGGER.info("Creating request with method: " + method + ", url: " + url + ", body: " + body + ", contentType: " + contentType);
         switch (method.toUpperCase()) {
             case "POST":
-                HttpPost postRequest = new HttpPost(url);
-                postRequest.setEntity(new StringEntity(body));
-                postRequest.setHeader("Content-Type", contentType);
-                request = postRequest;
+                request = createPostRequest(url, body, contentType);
                 break;
             case "PUT":
-                HttpPut putRequest = new HttpPut(url);
-                putRequest.setEntity(new StringEntity(body));
-                putRequest.setHeader("Content-Type", contentType);
-                request = putRequest;
+                request = createPutRequest(url, body, contentType);
                 break;
             case "DELETE":
-                HttpDelete deleteRequest = new HttpDelete(url);
-                request = deleteRequest;
+                request = new HttpDelete(url);
                 break;
             case "GET":
             default:
                 request = new HttpGet(url);
                 break;
         }
-
+        LOGGER.info("Request created successfully");
         return request;
+    }
+
+    private HttpPost createPostRequest(String url, String body, String contentType) {
+        HttpPost postRequest = new HttpPost(url);
+        setRequestBody(postRequest, body, contentType);
+        return postRequest;
+    }
+
+    private HttpPut createPutRequest(String url, String body, String contentType) {
+        HttpPut putRequest = new HttpPut(url);
+        setRequestBody(putRequest, body, contentType);
+        return putRequest;
+    }
+
+    private void setRequestBody(HttpEntityEnclosingRequestBase request, String body, String contentType) {
+        if (body != null && !body.isEmpty()) {
+            request.setEntity(new StringEntity(body, "UTF-8"));
+            request.setHeader("Content-Type", contentType != null ? contentType : "application/json");
+        }
     }
 }
