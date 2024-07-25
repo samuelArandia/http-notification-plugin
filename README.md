@@ -1,4 +1,12 @@
 # How to Run the Project:
+
+## Requirements
+
+- Java 8 or higher
+- Maven
+- Docker
+- Docker Compose
+
 ### Build: 
 Use Maven to clean and compile the project.
 python
