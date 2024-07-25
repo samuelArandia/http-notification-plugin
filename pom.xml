@@ -38,6 +38,11 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.5.1</version> <!-- Usa la versión más reciente -->
+        </dependency>
     </dependencies>
     <build>
         <plugins>

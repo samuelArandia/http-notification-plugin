@@ -1,9 +1,6 @@
 package org.example;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +17,7 @@ public class Main {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
-        // Set the default locale (optional, can be set from system properties or configuration)
+
         Locale.setDefault(new Locale("en", "US"));
 
         // Load the resource bundle for internationalization
@@ -29,14 +26,17 @@ public class Main {
         // Create a new instance of the HttpNotificationPlugin
         HttpNotificationPlugin plugin = new HttpNotificationPlugin();
 
-        // Configure the parameters for the notification
+        // Generate a random message
+        String randomBody = getRandomMessage();
+
+        // Configure the notification
         Map<String, String> config = new HashMap<>();
         config.put("url", "http://httpbin.org/post");
         config.put("method", "POST");
-        config.put("body", "{\"message\":\"Hello, World!\"}");
+        config.put("body", "{\"message\":\"" + randomBody + "\"}");
         config.put("contentType", "application/json");
 
-        // Send the notification and handle the result
+        // Send the notification
         try {
             boolean result = plugin.postNotification("trigger", new HashMap<>(), config);
             if (result) {
@@ -47,5 +47,28 @@ public class Main {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, messages.getString("notification.error"), e);
         }
+    }
+
+    /**
+     * Get a random message from a predefined list.
+     *
+     * @return A random message.
+     */
+    private static String getRandomMessage() {
+        List<String> messages = Arrays.asList(
+                "System update completed successfully.",
+                "New user registered: Samuel Arandia",
+                "Database backup was successful.",
+                "Server rebooted without issues.",
+                "New comment posted on the blog.",
+                "User login detected from a new device.",
+                "Password change request received.",
+                "Scheduled maintenance completed.",
+                "Payment received for order ID: 12345.",
+                "New order placed with ID: 12345."
+        );
+
+        Random random = new Random();
+        return messages.get(random.nextInt(messages.size()));
     }
 }
